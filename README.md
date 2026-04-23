@@ -1,1 +1,2 @@
-esse é seu novo plano fit 
+This is your new fitness plan.
+https://lhhenrique.github.io/fit-plan/
