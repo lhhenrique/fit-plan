@@ -3,180 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Plano Fit - Estilo Apple</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FitPlan Pro - Completo</title>
     <style>
         :root { 
-            --primary: #007AFF; /* Azul clássico da Apple */
-            --success: #34C759; /* Verde iOS */
-            --bg: #F2F2F7;      /* Fundo padrão iOS */
-            --card-bg: rgba(255, 255, 255, 0.8);
-            --text: #000000;
-            --text-secondary: #8E8E93;
+            --primary: #007AFF; --success: #34C759; --accent: #FF9500; 
+            --bg: #F2F2F7; --card: #FFFFFF; --text: #000000; --text-secondary: #8E8E93;
         }
-
-        /* Estética "Glassmorphism" e fontes do sistema Apple */
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --text-secondary: #AEAEB2; }
+        }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; 
             -webkit-font-smoothing: antialiased;
         }
-
-        .container { 
-            max-width: 600px; 
-            margin: auto; 
-            background: var(--card-bg);
-            backdrop-filter: blur(20px); /* Efeito de desfoque Apple */
-            -webkit-backdrop-filter: blur(20px);
-            padding: 25px; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 30px rgba(0,0,0,0.05); 
-        }
-
-        h1 { font-weight: 700; letter-spacing: -0.5px; text-align: center; margin-bottom: 30px; }
-
-        .form-group { margin-bottom: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
         
-        label { 
-            font-size: 13px; 
-            text-transform: uppercase; 
-            color: var(--text-secondary); 
-            margin-left: 5px;
-            margin-bottom: 8px;
-            display: block;
-            font-weight: 600;
-        }
+        .secao-input { background: var(--card); border-radius: 14px; padding: 5px 15px; margin-bottom: 20px; }
+        .input-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid #C6C6C8; }
+        .input-row:last-child { border-bottom: none; }
+        label { width: 140px; font-size: 16px; font-weight: 400; }
+        input, select { flex: 1; border: none; background: transparent; font-size: 16px; color: var(--text); text-align: right; outline: none; }
 
-        /* Inputs estilo iOS */
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: none;
-            background: #E9E9EB;
-            border-radius: 12px; 
-            font-size: 17px; /* Evita zoom no iPhone */
-            box-sizing: border-box;
-            outline: none;
-            -webkit-appearance: none; /* Remove sombras padrão do Safari */
-        }
-
-        input:focus { background: #E2E2E4; box-shadow: 0 0 0 2px var(--primary); }
-
-        /* Botão estilo Apple */
         button { 
-            width: 100%; 
-            padding: 16px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 14px; 
-            font-size: 17px; 
-            font-weight: 600;
-            cursor: pointer; 
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
+            width: 100%; padding: 16px; background: var(--primary); color: white; border: none; 
+            border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer;
         }
-
-        button:active { transform: scale(0.98); opacity: 0.9; }
-
-        #resultado { margin-top: 30px; display: none; animation: slideUp 0.4s ease-out; }
-
-        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        
-        .card { 
-            background: white; 
-            padding: 15px; 
-            text-align: center; 
-            border-radius: 15px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        }
-
-        .card strong { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
+        #resultado { margin-top: 25px; display: none; animation: fadeIn 0.4s; }
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; }
+        .card strong { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
         .card span { font-size: 18px; font-weight: 700; color: var(--primary); }
 
-        .secao { 
-            background: white; 
-            padding: 18px; 
-            border-radius: 15px; 
-            margin-bottom: 15px;
-        }
-
-        .secao h3 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #F2F2F7; padding-bottom: 10px; }
-
-        @keyframes slideUp { 
-            from { transform: translateY(20px); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
-        }
-
-        /* Ajuste para modo escuro automático (Dark Mode) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #000000;
-                --card-bg: rgba(28, 28, 30, 0.8);
-                --text: #FFFFFF;
-                --text-secondary: #8E8E93;
-            }
-            input, select { background: #2C2C2E; color: white; }
-            .card, .secao { background: #1C1C1E; }
-        }
+        .bloco { background: var(--card); padding: 18px; border-radius: 16px; margin-bottom: 15px; }
+        .bloco h3 { margin: 0 0 12px 0; font-size: 18px; color: var(--primary); }
+        .op { border-left: 3px solid var(--success); padding-left: 10px; margin-bottom: 15px; font-size: 14px; }
+        .destaque { font-weight: 700; color: var(--text); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Plano <span style="color:var(--primary)">Smart</span></h1>
+    <h1>Saúde <span style="color:var(--primary);">Smart</span></h1>
     
     <div id="form-dieta">
-        <div class="form-group">
-            <label>Idade, Peso e Altura</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="number" id="idade" placeholder="Idade">
-                <input type="number" id="peso" placeholder="kg">
-                <input type="number" id="altura" placeholder="cm">
+        <div class="secao-input">
+            <div class="input-row"><label>Idade</label><input type="number" id="idade" placeholder="Anos"></div>
+            <div class="input-row"><label>Peso (kg)</label><input type="number" id="peso" step="0.1" placeholder="0.0"></div>
+            <div class="input-row"><label>Altura (cm)</label><input type="number" id="altura" placeholder="0"></div>
+        </div>
+
+        <div class="secao-input">
+            <div class="input-row">
+                <label>Atividade</label>
+                <select id="atividade">
+                    <option value="1.2">Sedentário</option>
+                    <option value="1.375">Leve (1-2x semana)</option>
+                    <option value="1.55">Moderado (3-5x semana)</option>
+                    <option value="1.725">Intenso (Todo dia)</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Objetivo</label>
+                <select id="objetivo">
+                    <option value="emagrecer">Emagrecer</option>
+                    <option value="manter">Manter Peso</option>
+                    <option value="ganhar">Ganhar Massa</option>
+                </select>
+            </div>
+            <div class="input-row">
+                <label>Esporte</label>
+                <input type="text" id="esporte" placeholder="Ex: Corrida, Crossfit...">
+            </div>
+            <div class="input-row">
+                <label>Restrição</label>
+                <select id="restricao">
+                    <option value="nenhuma">Nenhuma</option>
+                    <option value="vegano">Vegano / Vegetariano</option>
+                    <option value="lactose">Sem Lactose</option>
+                    <option value="gluten">Sem Glúten</option>
+                </select>
             </div>
         </div>
-
-        <div class="form-group">
-            <label>Objetivo</label>
-            <select id="objetivo">
-                <option value="emagrecer">Emagrecimento</option>
-                <option value="manter">Manutenção</option>
-                <option value="ganhar">Ganho de Massa</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Atividade</label>
-            <select id="atividade">
-                <option value="1.2">Sedentário</option>
-                <option value="1.55">Moderado (3-5 dias)</option>
-                <option value="1.725">Intenso (Treino diário)</option>
-            </select>
-        </div>
-
-        <button onclick="gerarPlano()">Calcular Plano</button>
+        <button onclick="gerarPlano()">Gerar Meu Plano</button>
     </div>
 
     <div id="resultado">
         <div class="card-grid">
-            <div class="card"><strong>CARBOS</strong><span id="res-c"></span>g</div>
-            <div class="card"><strong>PROT</strong><span id="res-p"></span>g</div>
-            <div class="card"><strong>KCAL</strong><span id="res-k"></span></div>
+            <div class="card"><strong>Kcal</strong><span id="res-kcal"></span></div>
+            <div class="card"><strong>Prot</strong><span id="res-p"></span>g</div>
+            <div class="card"><strong>Carb</strong><span id="res-c"></span>g</div>
         </div>
 
-        <div class="secao">
-            <h3>🍴 Cardápio Sugerido</h3>
-            <div id="dieta-detalhes" style="font-size: 15px;"></div>
+        <div class="bloco">
+            <h3>🍴 Cardápio Adaptado</h3>
+            <div id="lista-dieta"></div>
         </div>
 
-        <div class="secao" style="border-left: 4px solid var(--success);">
-            <h3>💪 Treino Recomendado</h3>
-            <div id="treino-detalhes" style="font-size: 15px;"></div>
+        <div class="bloco" style="border-left: 4px solid var(--accent);">
+            <h3>🏅 Análise Esportiva</h3>
+            <p id="dica-esporte" style="font-size: 14px; line-height: 1.4;"></p>
         </div>
         
-        <button onclick="location.reload()" style="background: #3A3A3C; margin-top: 10px;">Novo Cálculo</button>
+        <button onclick="location.reload()" style="background: #3A3A3C;">Novo Cálculo</button>
     </div>
 </div>
 
@@ -185,39 +119,68 @@ function gerarPlano() {
     const idade = parseInt(document.getElementById('idade').value);
     const peso = parseFloat(document.getElementById('peso').value);
     const altura = parseFloat(document.getElementById('altura').value);
-    const objetivo = document.getElementById('objetivo').value;
     const atividade = parseFloat(document.getElementById('atividade').value);
+    const objetivo = document.getElementById('objetivo').value;
+    const esporte = document.getElementById('esporte').value || "seu esporte";
+    const restricao = document.getElementById('restricao').value;
 
-    if (!idade || !peso || !altura) return;
+    if (!idade || !peso || !altura) return alert("Por favor, preencha os dados básicos.");
 
-    // Cálculo simplificado
-    let kcal = (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
-    kcal = kcal * atividade;
+    // Cálculo TMB e Gasto
+    let tmb = (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
+    let kcal = tmb * atividade;
     if (objetivo === 'emagrecer') kcal -= 500;
-    if (objetivo === 'ganhar') kcal += 400;
+    if (objetivo === 'ganhar') kcal += 450;
 
     const p = peso * 2;
-    const c = (kcal - (p * 4) - (peso * 0.8 * 9)) / 4;
+    const g = peso * 0.8;
+    const c = (kcal - (p * 4) - (g * 9)) / 4;
 
-    // Quantidades específicas
     const arroz = Math.round((c/4) / 0.28);
     const frango = Math.round((p/4) / 0.30);
+    const ovos = Math.round((p/4) / 6);
 
-    document.getElementById('res-k').innerText = Math.round(kcal);
+    // Lógica de substituição por restrição
+    let cafe, almoco, lanche, jantar;
+
+    if (restricao === 'vegano') {
+        cafe = `Op 1: Tofu mexido com cúrcuma + 1 Fruta<br>Op 2: Iogurte de coco + 40g Aveia`;
+        almoco = `Op 1: ${arroz}g Arroz + 150g Grão de bico + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + 120g Hambúrguer de Lentilha`;
+        lanche = `Mix de nozes (30g) + 1 Banana`;
+        jantar = `Op 1: ${Math.round(arroz*0.8)}g Quinoa + Tofu grelhado<br>Op 2: Sopa de ervilha com legumes`;
+    } else if (restricao === 'lactose') {
+        cafe = `Op 1: ${ovos} Ovos + Fruta<br>Op 2: Tapioca com ovos mexidos`;
+        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + Carne Moída`;
+        lanche = `Fruta + 30g Castanhas`;
+        jantar = `${Math.round(arroz*0.8)}g Arroz + ${frango}g Peixe + Vegetais`;
+    } else if (restricao === 'gluten') {
+        cafe = `Op 1: ${ovos} Ovos + Raízes (Mandioca/Aipim)<br>Op 2: Omelete com queijo e fruta`;
+        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata Doce + Carne Moída`;
+        lanche = `Mix de frutas secas e iogurte (sem glúten)`;
+        jantar = `${Math.round(arroz*0.8)}g Arroz + ${frango}g Carne + Vegetais`;
+    } else {
+        cafe = `Op 1: ${ovos} Ovos + 1 Fruta<br>Op 2: Iogurte Natural + 40g Aveia`;
+        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + Carne Moída`;
+        lanche = `30g Castanhas + 1 Fruta ou Shake de Proteína`;
+        jantar = `Op 1: ${Math.round(arroz*0.8)}g Arroz + ${frango}g Peixe<br>Op 2: Omelete de ${ovos} ovos com legumes`;
+    }
+
+    document.getElementById('res-kcal').innerText = Math.round(kcal);
     document.getElementById('res-p').innerText = Math.round(p);
     document.getElementById('res-c').innerText = Math.round(c);
 
-    document.getElementById('dieta-detalhes').innerHTML = `
-        <p>• <b>Almoço:</b> ${arroz}g de Arroz + ${frango}g de Frango + Salada.</p>
-        <p>• <b>Jantar:</b> ${Math.round(arroz*0.8)}g de Arroz + ${frango}g de Peixe/Frango.</p>
-        <p>• <b>Lanches:</b> Ovos, Frutas e Castanhas conforme as metas acima.</p>
+    document.getElementById('lista-dieta').innerHTML = `
+        <div class="op"><span class="destaque">Café:</span><br>${cafe}</div>
+        <div class="op"><span class="destaque">Almoço:</span><br>${almoco}</div>
+        <div class="op"><span class="destaque">Lanche:</span><br>${lanche}</div>
+        <div class="op"><span class="destaque">Jantar:</span><br>${jantar}</div>
     `;
 
-    let treino = "Treino Híbrido: Musculação + 20min Cardio.";
-    if(objetivo === 'emagrecer') treino = "Foco em Cardio (HIIT) + Musculação leve.";
-    if(objetivo === 'ganhar') treino = "Foco em Força (Cargas altas) + Pouco cardio.";
-    
-    document.getElementById('treino-detalhes').innerText = treino;
+    document.getElementById('dica-esporte').innerHTML = `
+        Análise para <b>${esporte}</b>: <br>
+        Seu plano foi ajustado para seu objetivo de <b>${objetivo}</b>. 
+        Mantenha a constância e beba pelo menos ${Math.round(peso * 35 / 1000)}L de água por dia.
+    `;
 
     document.getElementById('form-dieta').style.display = 'none';
     document.getElementById('resultado').style.display = 'block';
