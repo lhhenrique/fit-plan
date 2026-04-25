@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FitPlan Pro - Completo</title>
+    <title>FitPlan Pro - Edição Definitiva</title>
     <style>
         :root { 
             --primary: #007AFF; --success: #34C759; --accent: #FF9500; 
@@ -23,15 +23,17 @@
         h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
         
         .secao-input { background: var(--card); border-radius: 14px; padding: 5px 15px; margin-bottom: 20px; }
-        .input-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid #C6C6C8; }
+        .input-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(198, 198, 200, 0.4); }
         .input-row:last-child { border-bottom: none; }
         label { width: 140px; font-size: 16px; font-weight: 400; }
         input, select { flex: 1; border: none; background: transparent; font-size: 16px; color: var(--text); text-align: right; outline: none; }
 
         button { 
             width: 100%; padding: 16px; background: var(--primary); color: white; border: none; 
-            border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer;
+            border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
         }
+        button:active { opacity: 0.7; }
+
         #resultado { margin-top: 25px; display: none; animation: fadeIn 0.4s; }
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; }
@@ -43,6 +45,11 @@
         .op { border-left: 3px solid var(--success); padding-left: 10px; margin-bottom: 15px; font-size: 14px; }
         .destaque { font-weight: 700; color: var(--text); }
         
+        /* Histórico */
+        #historico-secao { margin-top: 40px; border-top: 1px solid rgba(198, 198, 200, 0.4); padding-top: 20px; }
+        .hist-item { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .hist-data { font-size: 11px; color: var(--text-secondary); }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
     </style>
 </head>
@@ -53,8 +60,8 @@
     
     <div id="form-dieta">
         <div class="secao-input">
-            <div class="input-row"><label>Idade</label><input type="number" id="idade" placeholder="Anos"></div>
             <div class="input-row"><label>Peso (kg)</label><input type="number" id="peso" step="0.1" placeholder="0.0"></div>
+            <div class="input-row"><label>Idade</label><input type="number" id="idade" placeholder="Anos"></div>
             <div class="input-row"><label>Altura (cm)</label><input type="number" id="altura" placeholder="0"></div>
         </div>
 
@@ -78,19 +85,19 @@
             </div>
             <div class="input-row">
                 <label>Esporte</label>
-                <input type="text" id="esporte" placeholder="Ex: Corrida, Crossfit...">
+                <input type="text" id="esporte" placeholder="Ex: Jiu Jitsu, Corrida...">
             </div>
             <div class="input-row">
                 <label>Restrição</label>
                 <select id="restricao">
                     <option value="nenhuma">Nenhuma</option>
-                    <option value="vegano">Vegano / Vegetariano</option>
+                    <option value="vegano">Vegano</option>
                     <option value="lactose">Sem Lactose</option>
                     <option value="gluten">Sem Glúten</option>
                 </select>
             </div>
         </div>
-        <button onclick="gerarPlano()">Gerar Meu Plano</button>
+        <button onclick="gerarPlano()">Gerar Relatório</button>
     </div>
 
     <div id="resultado">
@@ -106,84 +113,105 @@
         </div>
 
         <div class="bloco" style="border-left: 4px solid var(--accent);">
-            <h3>🏅 Análise Esportiva</h3>
-            <p id="dica-esporte" style="font-size: 14px; line-height: 1.4;"></p>
+            <h3>🏅 Feedback de Performance</h3>
+            <p id="dica-esporte" style="font-size: 14px; line-height: 1.5;"></p>
         </div>
         
         <button onclick="location.reload()" style="background: #3A3A3C;">Novo Cálculo</button>
     </div>
+
+    <div id="historico-secao">
+        <h3 style="font-size: 16px; margin-bottom: 15px;">🕒 Histórico</h3>
+        <div id="lista-historico"></div>
+        <button onclick="limparHistorico()" id="btn-limpar" style="background:transparent; color:#FF3B30; font-size:13px; font-weight:400; display:none;">Apagar Histórico</button>
+    </div>
 </div>
 
 <script>
+window.onload = exibirHistorico;
+
 function gerarPlano() {
-    const idade = parseInt(document.getElementById('idade').value);
-    const peso = parseFloat(document.getElementById('peso').value);
-    const altura = parseFloat(document.getElementById('altura').value);
+    const pInput = parseFloat(document.getElementById('peso').value);
+    const iInput = parseInt(document.getElementById('idade').value);
+    const aInput = parseFloat(document.getElementById('altura').value);
     const atividade = parseFloat(document.getElementById('atividade').value);
     const objetivo = document.getElementById('objetivo').value;
-    const esporte = document.getElementById('esporte').value || "seu esporte";
+    const esporteRaw = document.getElementById('esporte').value.toLowerCase();
     const restricao = document.getElementById('restricao').value;
 
-    if (!idade || !peso || !altura) return alert("Por favor, preencha os dados básicos.");
+    if (!pInput || !iInput || !aInput) return alert("Preencha os campos obrigatórios.");
 
-    // Cálculo TMB e Gasto
-    let tmb = (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
-    let kcal = tmb * atividade;
+    // Cálculos
+    let kcal = ((10 * pInput) + (6.25 * aInput) - (5 * iInput) + 5) * atividade;
     if (objetivo === 'emagrecer') kcal -= 500;
     if (objetivo === 'ganhar') kcal += 450;
 
-    const p = peso * 2;
-    const g = peso * 0.8;
-    const c = (kcal - (p * 4) - (g * 9)) / 4;
+    const protG = pInput * 2;
+    const carbG = (kcal - (protG * 4) - (pInput * 0.8 * 9)) / 4;
 
-    const arroz = Math.round((c/4) / 0.28);
-    const frango = Math.round((p/4) / 0.30);
-    const ovos = Math.round((p/4) / 6);
+    // Salvar no Histórico
+    const hist = JSON.parse(localStorage.getItem('fitplan_data')) || [];
+    hist.unshift({ data: new Date().toLocaleDateString('pt-BR'), peso: pInput, kcal: Math.round(kcal) });
+    localStorage.setItem('fitplan_data', JSON.stringify(hist.slice(0, 5)));
 
-    // Lógica de substituição por restrição
-    let cafe, almoco, lanche, jantar;
-
-    if (restricao === 'vegano') {
-        cafe = `Op 1: Tofu mexido com cúrcuma + 1 Fruta<br>Op 2: Iogurte de coco + 40g Aveia`;
-        almoco = `Op 1: ${arroz}g Arroz + 150g Grão de bico + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + 120g Hambúrguer de Lentilha`;
-        lanche = `Mix de nozes (30g) + 1 Banana`;
-        jantar = `Op 1: ${Math.round(arroz*0.8)}g Quinoa + Tofu grelhado<br>Op 2: Sopa de ervilha com legumes`;
-    } else if (restricao === 'lactose') {
-        cafe = `Op 1: ${ovos} Ovos + Fruta<br>Op 2: Tapioca com ovos mexidos`;
-        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + Carne Moída`;
-        lanche = `Fruta + 30g Castanhas`;
-        jantar = `${Math.round(arroz*0.8)}g Arroz + ${frango}g Peixe + Vegetais`;
-    } else if (restricao === 'gluten') {
-        cafe = `Op 1: ${ovos} Ovos + Raízes (Mandioca/Aipim)<br>Op 2: Omelete com queijo e fruta`;
-        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata Doce + Carne Moída`;
-        lanche = `Mix de frutas secas e iogurte (sem glúten)`;
-        jantar = `${Math.round(arroz*0.8)}g Arroz + ${frango}g Carne + Vegetais`;
+    // Feedback Esportivo Específico
+    let feedback = "";
+    if (esporteRaw.includes("jiu") || esporteRaw.includes("luta") || esporteRaw.includes("boxe")) {
+        feedback = "<b>Foco em Combate:</b> Priorize gorduras boas para as articulações e mantenha o sódio sob controle. A hidratação é crítica para manter a pressão estável durante o rola/treino.";
+    } else if (esporteRaw.includes("corrida") || esporteRaw.includes("bike") || esporteRaw.includes("natação")) {
+        feedback = "<b>Foco em Endurance:</b> Você precisa de reserva de glicogênio. Foque na opção A de carboidratos no almoço e aumente a ingestão de água.";
+    } else if (esporteRaw.includes("musculação") || esporteRaw.includes("academia")) {
+        feedback = "<b>Foco em Força:</b> Distribua a proteína em pelo menos 4 janelas. Carboidratos são essenciais para carga; não os corte drasticamente.";
     } else {
-        cafe = `Op 1: ${ovos} Ovos + 1 Fruta<br>Op 2: Iogurte Natural + 40g Aveia`;
-        almoco = `Op 1: ${arroz}g Arroz + ${frango}g Frango + Salada<br>Op 2: ${Math.round(arroz*1.2)}g Batata + Carne Moída`;
-        lanche = `30g Castanhas + 1 Fruta ou Shake de Proteína`;
-        jantar = `Op 1: ${Math.round(arroz*0.8)}g Arroz + ${frango}g Peixe<br>Op 2: Omelete de ${ovos} ovos com legumes`;
+        feedback = `Para <b>${esporteRaw || "seu esporte"}</b>, o segredo é o equilíbrio. Beba ${Math.round(pInput * 35)}ml de água diariamente.`;
     }
 
+    // Alimentos Base (Cálculo em Gramas)
+    const arrozG = Math.round((carbG/4) / 0.28);
+    const carneG = Math.round((protG/4) / 0.30);
+    const ovosN = Math.round((protG/4) / 6);
+
+    // Cardápio A/B
+    let cafe, almoco, lanche, jantar;
+    if (restricao === 'vegano') {
+        cafe = `A: Tofu Mexido + Fruta<br>B: Iogurte de Coco + 40g Aveia`;
+        almoco = `A: ${arrozG}g Arroz + 150g Grão de Bico<br>B: ${Math.round(arrozG*1.2)}g Batata + 120g Hambúrguer Vegetal`;
+        lanche = `A: 30g Castanhas + Fruta<br>B: Shake de Proteína Vegetal`;
+        jantar = `A: ${Math.round(arrozG*0.8)}g Quinoa + Tofu<br>B: Sopa de Lentilha`;
+    } else {
+        cafe = `A: ${ovosN} Ovos + Fruta<br>B: Iogurte Natural + 40g Aveia`;
+        almoco = `A: ${arrozG}g Arroz + ${carneG}g Frango<br>B: ${Math.round(arrozG*1.2)}g Batata + ${carneG}g Carne Moída`;
+        lanche = `A: 30g Castanhas + Fruta<br>B: Whey + 1 Banana`;
+        jantar = `A: ${Math.round(arrozG*0.8)}g Arroz + ${carneG}g Peixe<br>B: Omelete de ${ovosN} ovos + Salada`;
+    }
+
+    // Exibir
     document.getElementById('res-kcal').innerText = Math.round(kcal);
-    document.getElementById('res-p').innerText = Math.round(p);
-    document.getElementById('res-c').innerText = Math.round(c);
-
+    document.getElementById('res-p').innerText = Math.round(protG);
+    document.getElementById('res-c').innerText = Math.round(carbG);
+    document.getElementById('dica-esporte').innerHTML = feedback;
     document.getElementById('lista-dieta').innerHTML = `
-        <div class="op"><span class="destaque">Café:</span><br>${cafe}</div>
-        <div class="op"><span class="destaque">Almoço:</span><br>${almoco}</div>
-        <div class="op"><span class="destaque">Lanche:</span><br>${lanche}</div>
-        <div class="op"><span class="destaque">Jantar:</span><br>${jantar}</div>
-    `;
-
-    document.getElementById('dica-esporte').innerHTML = `
-        Análise para <b>${esporte}</b>: <br>
-        Seu plano foi ajustado para seu objetivo de <b>${objetivo}</b>. 
-        Mantenha a constância e beba pelo menos ${Math.round(peso * 35 / 1000)}L de água por dia.
+        <div class="op"><strong>Café:</strong><br>${cafe}</div>
+        <div class="op"><strong>Almoço:</strong><br>${almoco}</div>
+        <div class="op"><strong>Lanche:</strong><br>${lanche}</div>
+        <div class="op"><strong>Jantar:</strong><br>${jantar}</div>
     `;
 
     document.getElementById('form-dieta').style.display = 'none';
     document.getElementById('resultado').style.display = 'block';
+    exibirHistorico();
+}
+
+function exibirHistorico() {
+    const hist = JSON.parse(localStorage.getItem('fitplan_data')) || [];
+    const lista = document.getElementById('lista-historico');
+    const btn = document.getElementById('btn-limpar');
+    if (hist.length > 0) btn.style.display = 'block';
+    lista.innerHTML = hist.map(i => `<div class="hist-item"><div><strong>${i.peso}kg</strong> <span style="color:var(--primary)">${i.kcal} kcal</span></div><div class="hist-data">${i.data}</div></div>`).join('');
+}
+
+function limparHistorico() {
+    if(confirm("Limpar registros?")) { localStorage.removeItem('fitplan_data'); exibirHistorico(); document.getElementById('btn-limpar').style.display = 'none'; }
 }
 </script>
 </body>
