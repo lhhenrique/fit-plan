@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FitPlan Pro - Edição Especialista</title>
+    <title>FitPlan Smart - Elite Edition</title>
     <style>
         :root { 
             --primary: #007AFF; --success: #34C759; --accent: #FF9500; 
@@ -21,42 +21,47 @@
         }
         .container { max-width: 500px; margin: auto; }
         
-        /* Estilização do Header com Logo */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
+        header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px; }
         h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; }
 
         .secao-input { background: var(--card); border-radius: 14px; padding: 5px 15px; margin-bottom: 20px; }
         .input-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(198, 198, 200, 0.4); }
         .input-row:last-child { border-bottom: none; }
-        label { width: 140px; font-size: 16px; font-weight: 400; }
-        input, select { flex: 1; border: none; background: transparent; font-size: 16px; color: var(--text); text-align: right; outline: none; }
+        label { width: 140px; font-size: 15px; }
+        input, select { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); text-align: right; outline: none; }
+
+        .agenda-grid { background: var(--card); border-radius: 14px; padding: 15px; margin-bottom: 20px; }
+        .agenda-grid h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--primary); text-align: center; }
+        .dia-row { display: flex; align-items: center; margin-bottom: 8px; gap: 10px; }
+        .dia-label { width: 45px; font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; }
+        .dia-input { flex: 1; background: var(--bg); border: none; padding: 10px; border-radius: 10px; font-size: 14px; color: var(--text); }
 
         button { 
-            width: 100%; padding: 16px; background: var(--primary); color: white; border: none; 
+            width: 100%; padding: 18px; background: var(--primary); color: white; border: none; 
             border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; margin-bottom: 10px;
         }
-        button:active { opacity: 0.7; }
 
-        #resultado { margin-top: 25px; display: none; animation: fadeIn 0.4s; }
+        #resultado { display: none; animation: fadeIn 0.4s; }
+        .perfil-resumo-top { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; padding-left: 10px; border-left: 3px solid var(--primary); }
+        
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
-        .card strong { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
-        .card span { font-size: 18px; font-weight: 700; color: var(--primary); }
+        .card { background: var(--card); padding: 15px; border-radius: 14px; text-align: center; }
+        .card strong { display: block; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 5px; }
+        .card span { font-size: 18px; font-weight: 800; color: var(--primary); }
 
         .bloco { background: var(--card); padding: 18px; border-radius: 16px; margin-bottom: 15px; }
-        .bloco h3 { margin: 0 0 12px 0; font-size: 18px; color: var(--primary); }
-        .op { border-left: 3px solid var(--success); padding-left: 10px; margin-bottom: 15px; font-size: 14px; }
+        .bloco h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--primary); }
         
-        #historico-secao { margin-top: 40px; border-top: 1px solid rgba(198, 198, 200, 0.4); padding-top: 20px; }
-        .hist-item { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-        .hist-data { font-size: 11px; color: var(--text-secondary); }
+        .dieta-box { border-left: 4px solid var(--success); padding-left: 12px; margin-bottom: 20px; }
+        .dieta-box.alt { border-left-color: var(--accent); }
+        .dieta-box b { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; display: block; }
+        .dieta-box p { margin: 5px 0 0; font-size: 15px; line-height: 1.4; }
+
+        .info-final { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .info-final b { color: var(--text); }
+
+        #historico-secao { margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(198, 198, 200, 0.4); }
+        .hist-item { background: var(--card); padding: 10px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
     </style>
@@ -82,21 +87,18 @@
     
     <div id="form-dieta">
         <div class="secao-input">
-            <div class="input-row"><label>Peso (kg)</label><input type="number" id="peso" step="0.1" placeholder="0.0"></div>
-            <div class="input-row"><label>Idade</label><input type="number" id="idade" placeholder="Anos"></div>
-            <div class="input-row"><label>Altura (cm)</label><input type="number" id="altura" placeholder="0"></div>
+            <div class="input-row"><label>Nome</label><input type="text" id="nome"></div>
+            <div class="input-row"><label>Peso (kg)</label><input type="number" id="peso" step="0.1"></div>
+            <div class="input-row"><label>Altura (cm)</label><input type="number" id="altura"></div>
+            <div class="input-row"><label>Idade</label><input type="number" id="idade"></div>
+        </div>
+
+        <div class="agenda-grid">
+            <h3>🗓️ Minha Agenda de Treinos</h3>
+            <div id="agenda-inputs"></div>
         </div>
 
         <div class="secao-input">
-            <div class="input-row">
-                <label>Atividade</label>
-                <select id="atividade">
-                    <option value="1.2">Sedentário</option>
-                    <option value="1.375">Leve (1-2x semana)</option>
-                    <option value="1.55">Moderado (3-5x semana)</option>
-                    <option value="1.725">Intenso (Todo dia)</option>
-                </select>
-            </div>
             <div class="input-row">
                 <label>Objetivo</label>
                 <select id="objetivo">
@@ -104,10 +106,6 @@
                     <option value="manter">Manter Peso</option>
                     <option value="ganhar">Ganhar Massa</option>
                 </select>
-            </div>
-            <div class="input-row">
-                <label>Esporte</label>
-                <input type="text" id="esporte" placeholder="Jiu Jitsu, Corrida, Musculação...">
             </div>
             <div class="input-row">
                 <label>Restrição</label>
@@ -119,107 +117,152 @@
                 </select>
             </div>
         </div>
-        <button onclick="gerarPlano()">Gerar Plano Inteligente</button>
+        <button onclick="gerarPlano()">Gerar Estratégia de Elite</button>
     </div>
 
     <div id="resultado">
+        <h2 id="saudacao"></h2>
+        <div id="perfil-info-top" class="perfil-resumo-top"></div>
+
         <div class="card-grid">
             <div class="card"><strong>Kcal</strong><span id="res-kcal"></span></div>
-            <div class="card"><strong>Prot</strong><span id="res-p"></span>g</div>
-            <div class="card"><strong>Carb</strong><span id="res-c"></span>g</div>
-        </div>
-
-        <div class="bloco">
-            <h3>🍴 Cardápio Adaptado</h3>
-            <div id="lista-dieta"></div>
+            <div class="card"><strong>Proteína</strong><span id="res-p"></span></div>
+            <div class="card"><strong>Carbo</strong><span id="res-c"></span></div>
         </div>
 
         <div class="bloco" style="border-left: 4px solid var(--accent);">
-            <h3>🏅 Feedback Esportivo Profissional</h3>
-            <div id="motor-esporte"></div>
+            <h3>🏅 Feedback Esportivo Estratégico</h3>
+            <div id="feedback-coach" style="font-size: 14px; line-height: 1.5; color: var(--text);"></div>
+        </div>
+
+        <div class="bloco">
+            <h3>🍴 Cardápio (A/B)</h3>
+            <div id="cardapio"></div>
+        </div>
+
+        <div class="bloco" style="background: rgba(0,0,0,0.03); border: 1px dashed var(--text-secondary);">
+            <h3>📋 Resumo do Perfil Técnico</h3>
+            <div id="info-usuario-final" class="info-final"></div>
+        </div>
+
+        <div id="historico-secao">
+            <h3 style="font-size: 14px; margin-bottom: 10px;">🕒 Histórico de Evolução</h3>
+            <div id="lista-historico"></div>
         </div>
         
-        <button onclick="location.reload()" style="background: #3A3A3C;">Novo Cálculo</button>
-    </div>
-
-    <div id="historico-secao">
-        <h3 style="font-size: 16px;">🕒 Histórico</h3>
-        <div id="lista-historico"></div>
-        <button onclick="limparHistorico()" id="btn-limpar" style="background:transparent; color:#FF3B30; font-size:12px; display:none; border:none; padding:10px; cursor:pointer; width: 100%;">Apagar Histórico</button>
+        <button onclick="location.reload()" style="background: #3A3A3C; margin-top: 20px;">Nova Consulta</button>
     </div>
 </div>
 
 <script>
-window.onload = exibirHistorico;
+const dias = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+
+window.onload = () => {
+    const container = document.getElementById('agenda-inputs');
+    dias.forEach(dia => {
+        const salvo = localStorage.getItem(`treino_${dia}`) || "";
+        container.innerHTML += `
+            <div class="dia-row">
+                <span class="dia-label">${dia}</span>
+                <input type="text" id="in_${dia}" class="dia-input" value="${salvo}" placeholder="Ex: Musculação + Cardio">
+            </div>`;
+    });
+    if(localStorage.getItem('fit_nome')) document.getElementById('nome').value = localStorage.getItem('fit_nome');
+    exibirHistorico();
+};
 
 function gerarPlano() {
-    const pInput = parseFloat(document.getElementById('peso').value);
-    const iInput = parseInt(document.getElementById('idade').value);
-    const aInput = parseFloat(document.getElementById('altura').value);
-    const atividade = parseFloat(document.getElementById('atividade').value);
+    const nome = document.getElementById('nome').value || "Atleta";
+    const peso = parseFloat(document.getElementById('peso').value);
+    const altura = parseFloat(document.getElementById('altura').value);
+    const idade = parseInt(document.getElementById('idade').value);
     const objetivo = document.getElementById('objetivo').value;
-    const esporteRaw = document.getElementById('esporte').value.toLowerCase();
     const restricao = document.getElementById('restricao').value;
 
-    if (!pInput || !iInput || !aInput) return alert("Preencha todos os campos.");
+    if (!peso || !altura || !idade) return alert("Preencha todos os dados.");
+    localStorage.setItem('fit_nome', nome);
 
-    let kcal = ((10 * pInput) + (6.25 * aInput) - (5 * iInput) + 5) * atividade;
-    if (objetivo === 'emagrecer') kcal -= 500;
+    let treinosTotais = 0;
+    let diasDuplos = 0;
+    let agendaStr = "";
+    let agendaResumo = "";
+
+    dias.forEach(dia => {
+        const t = document.getElementById(`in_${dia}`).value;
+        localStorage.setItem(`treino_${dia}`, t);
+        if(t.trim() && t.toLowerCase() !== "descanso") {
+            treinosTotais++;
+            agendaStr += t.toLowerCase() + " ";
+            agendaResumo += `${dia}: ${t} | `;
+            if(t.includes("+") || t.toLowerCase().includes(" e ")) diasDuplos++;
+        }
+    });
+
+    let fa = 1.2;
+    if(treinosTotais >= 3) fa = 1.375;
+    if(treinosTotais >= 5) fa = 1.55;
+    if(diasDuplos >= 2) fa = 1.725;
+    if(diasDuplos >= 4) fa = 1.9;
+
+    let kcal = ((10 * peso) + (6.25 * altura) - (5 * idade) + 5) * fa;
+    if (objetivo === 'emagrecer') kcal -= 450;
     if (objetivo === 'ganhar') kcal += 450;
 
-    const protG = pInput * 2;
-    const carbG = (kcal - (protG * 4) - (pInput * 0.8 * 9)) / 4;
+    const pG = peso * 2.2;
+    const cG = (kcal - (pG * 4) - (peso * 0.9 * 9)) / 4;
 
-    // --- LÓGICA DO MOTOR DE BUSCA DE ESPORTE ---
-    let feedback = "";
-    if (esporteRaw.includes("jiu") || esporteRaw.includes("luta") || esporteRaw.includes("boxe") || esporteRaw.includes("judô") || esporteRaw.includes("artes marciais")) {
-        feedback = "<b>Feedback de Combate:</b> Seu esporte exige alta demanda de energia intermitente. Priorize gorduras boas para proteger ligamentos e articulações. O sódio no pré-treino ajuda na pressão intra-abdominal e evita cãibras nos treinos de contato.";
-    } else if (esporteRaw.includes("corrida") || esporteRaw.includes("bike") || esporteRaw.includes("ciclismo") || esporteRaw.includes("natação") || esporteRaw.includes("endurance")) {
-        feedback = "<b>Feedback de Endurance:</b> O foco é a ressíntese de glicogênio. Seus carboidratos devem ser sua prioridade máxima. Use a 'Opção A' para garantir densidade calórica e não negligencie a hidratação mineral durante a prática.";
-    } else if (esporteRaw.includes("musculação") || esporteRaw.includes("academia") || esporteRaw.includes("hipertrofia") || esporteRaw.includes("bodybuilding")) {
-        feedback = "<b>Feedback de Força:</b> Para sinalizar hipertrofia, fracione as proteínas em pelo menos 4 janelas diárias. Use carboidratos complexos 1h30 antes do treino para sustentar a progressão de carga e volume.";
-    } else if (esporteRaw.includes("crossfit") || esporteRaw.includes("funcional") || esporteRaw.includes("wod")) {
-        feedback = "<b>Feedback Híbrido:</b> Você combina força e cardio. O corpo precisa de glicose disponível rápido. Frutas e mel são ótimos pré-treinos imediatos para sustentar a intensidade dos WODs sem quebrar massa muscular.";
-    } else if (esporteRaw.includes("futebol") || esporteRaw.includes("vôlei") || esporteRaw.includes("basquete") || esporteRaw.includes("tênis")) {
-        feedback = "<b>Feedback Intermitente:</b> Os sprints curtos drenam o glicogênio muscular. Após os jogos, sua janela de carboidratos é vital para evitar o catabolismo. Foque em vegetais de folhas escuras para magnésio e potássio.";
-    } else {
-        feedback = `Estratégia para <b>${esporteRaw || "sua modalidade"}</b>: Mantenha a hidratação em ${Math.round(pInput * 35)}ml diários e foque na constância das pesagens das refeições para atingir o objetivo de ${objetivo}.`;
+    // MOTOR DE FEEDBACK ESPORTIVO AVANÇADO
+    let fbk = `💧 <b>Hidratação Crítica:</b> Consuma no mínimo <b>${Math.round(peso * 45)}ml</b> de água. Em dias de treino, adicione 500ml para cada hora de atividade.<br><br>`;
+    
+    if(diasDuplos > 0) {
+        fbk += `⚡ <b>Volume de Elite:</b> Identificamos ${diasDuplos} dias de carga dupla. A <b>Opção A</b> do almoço é sua base de glicogênio. Se sentir fadiga, adicione 30g de Palatinose ou Malto durante o segundo treino.<br><br>`;
     }
 
-    // --- CARDÁPIO A/B ---
-    const arrozG = Math.round((carbG/4) / 0.28);
-    const carneG = Math.round((protG/4) / 0.30);
-    const ovosN = Math.round((protG/4) / 6);
-
-    let cafe, almoco, lanche, jantar;
-    if (restricao === 'vegano') {
-        cafe = `A: Tofu mexido + 1 Fruta<br>B: Iogurte de Coco + 40g Aveia`;
-        almoco = `A: ${arrozG}g Arroz + 150g Grão de bico<br>B: ${Math.round(arrozG*1.2)}g Batata + 120g Hambúrguer Lentilha`;
-        lanche = `A: 30g Castanhas + Fruta<br>B: Shake de Proteína Vegetal`;
-        jantar = `A: ${Math.round(arrozG*0.8)}g Quinoa + Tofu<br>B: Sopa de Ervilha`;
-    } else {
-        cafe = `A: ${ovosN} Ovos + 1 Fruta<br>B: Iogurte Natural + 40g Aveia`;
-        almoco = `A: ${arrozG}g Arroz + ${carneG}g Frango<br>B: ${Math.round(arrozG*1.2)}g Batata + ${carneG}g Carne Moída`;
-        lanche = `A: Fruta + 30g Castanhas<br>B: Whey Protein + 1 Banana`;
-        jantar = `A: ${Math.round(arrozG*0.8)}g Arroz + ${carneG}g Peixe<br>B: Omelete de ${ovosN} ovos + Salada`;
+    if(agendaStr.includes("futsal") || agendaStr.includes("corrida") || agendaStr.includes("cardio")) {
+        fbk += `🏃 <b>Perfil Endurace:</b> Para esportes de campo ou corrida, foque na ingestão de magnésio e potássio no jantar (vegetais escuros) para evitar cãibras noturnas.<br><br>`;
     }
 
-    // --- HISTÓRICO ---
-    const hist = JSON.parse(localStorage.getItem('fit_final_v4')) || [];
-    hist.unshift({ data: new Date().toLocaleDateString('pt-BR'), peso: pInput, kcal: Math.round(kcal) });
-    localStorage.setItem('fit_final_v4', JSON.stringify(hist.slice(0, 5)));
+    if(agendaStr.includes("jiu") || agendaStr.includes("luta") || agendaStr.includes("cross")) {
+        fbk += `🤼 <b>Impacto e Explosão:</b> Seus treinos exigem muito do sistema nervoso. Priorize o sono de 8h e considere 5g de Creatina diariamente para manter os estoques de ATP elevados.<br><br>`;
+    }
 
-    // --- EXIBIÇÃO ---
+    if(agendaStr.includes("musculação") || agendaStr.includes("treino") || agendaStr.includes("academia")) {
+        fbk += `💪 <b>Anabolismo:</b> Com ${treinosTotais} sessões semanais, sua janela proteica é constante. Tente distribuir as <b>${Math.round(pG)}g de proteína</b> em 4 ou 5 refeições iguais.<br>`;
+    }
+
+    document.getElementById('feedback-coach').innerHTML = fbk;
+
+    // UI E CARDÁPIO
+    document.getElementById('saudacao').innerText = `Consultoria: ${nome}`;
     document.getElementById('res-kcal').innerText = Math.round(kcal);
-    document.getElementById('res-p').innerText = Math.round(protG);
-    document.getElementById('res-c').innerText = Math.round(carbG);
-    document.getElementById('motor-esporte').innerHTML = `<p style="font-size:14px; line-height:1.4;">${feedback}</p>`;
-    document.getElementById('lista-dieta').innerHTML = `
-        <div class="op"><strong>Café:</strong><br>${cafe}</div>
-        <div class="op"><strong>Almoço:</strong><br>${almoco}</div>
-        <div class="op"><strong>Lanche:</strong><br>${lanche}</div>
-        <div class="op"><strong>Jantar:</strong><br>${jantar}</div>
+    document.getElementById('res-p').innerText = Math.round(pG) + "g";
+    document.getElementById('res-c').innerText = Math.round(cG) + "g";
+
+    const arroz = Math.round((cG * 0.35) / 0.28);
+    const frango = Math.round((pG * 0.35) / 0.25);
+    const pao = restricao === "gluten" ? "Pão S/ Glúten" : "Pão Integral";
+    const leite = restricao === "lactose" ? "S/ Lactose" : "Natural";
+
+    let menu = `
+        <div class="dieta-box"><b>Café da Manhã (A)</b><p>3 Ovos + 2 Fatias ${pao} + 1 Fruta</p></div>
+        <div class="dieta-box alt"><b>Café da Manhã (B)</b><p>Shake: 1 Banana + 40g Aveia + 30g Whey</p></div>
+        <div class="dieta-box"><b>Almoço (A)</b><p>${arroz}g Arroz + ${frango}g Frango + Vegetais Livres</p></div>
+        <div class="dieta-box alt"><b>Almoço (B)</b><p>${arroz + 40}g Batata Doce + ${frango}g Carne Magra</p></div>
+        <div class="dieta-box"><b>Jantar (A)</b><p>${frango}g Peixe/Frango + Brócolis + 1 Maçã</p></div>
+        <div class="dieta-box alt"><b>Jantar (B)</b><p>Omelete (3 ovos) + Queijo ${leite} + Salada Verde</p></div>
     `;
+    
+    document.getElementById('cardapio').innerHTML = menu;
+    document.getElementById('info-usuario-final').innerHTML = `
+        • <b>Atleta:</b> ${nome} | ${peso}kg | ${altura}cm<br>
+        • <b>Fator de Atividade:</b> ${fa.toFixed(3)} (${treinosTotais}x/sem)<br>
+        • <b>Restrições:</b> ${restricao.toUpperCase()}<br>
+        • <b>Rotina:</b> ${agendaResumo || "Não informada"}
+    `;
+
+    const h = JSON.parse(localStorage.getItem('fit_hist_vElite')) || [];
+    h.unshift({ d: new Date().toLocaleDateString(), p: peso, k: Math.round(kcal) });
+    localStorage.setItem('fit_hist_vElite', JSON.stringify(h.slice(0,5)));
 
     document.getElementById('form-dieta').style.display = 'none';
     document.getElementById('resultado').style.display = 'block';
@@ -227,24 +270,10 @@ function gerarPlano() {
 }
 
 function exibirHistorico() {
-    const hist = JSON.parse(localStorage.getItem('fit_final_v4')) || [];
-    const lista = document.getElementById('lista-historico');
-    const btn = document.getElementById('btn-limpar');
-    if (hist.length > 0) btn.style.display = 'block';
-    lista.innerHTML = hist.map(i => `
-        <div class="hist-item">
-            <div><strong>${i.peso}kg</strong> → <span style="color:var(--primary)">${i.kcal} kcal</span></div>
-            <div class="hist-data">${i.data}</div>
-        </div>
+    const h = JSON.parse(localStorage.getItem('fit_hist_vElite')) || [];
+    document.getElementById('lista-historico').innerHTML = h.map(i => `
+        <div class="hist-item"><span>${i.d}</span><strong>${i.p}kg · ${i.k} kcal</strong></div>
     `).join('');
-}
-
-function limparHistorico() {
-    if(confirm("Deseja apagar o histórico?")) {
-        localStorage.removeItem('fit_final_v4');
-        exibirHistorico();
-        document.getElementById('btn-limpar').style.display = 'none';
-    }
 }
 </script>
 </body>
