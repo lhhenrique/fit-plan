@@ -15,13 +15,23 @@
             :root { --bg: #000000; --card: #1C1C1E; --text: #FFFFFF; --text-secondary: #AEAEB2; }
         }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; 
             -webkit-font-smoothing: antialiased;
         }
         .container { max-width: 500px; margin: auto; }
-        h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
         
+        /* Estilização do Header com Logo */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin: 0; }
+
         .secao-input { background: var(--card); border-radius: 14px; padding: 5px 15px; margin-bottom: 20px; }
         .input-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 0.5px solid rgba(198, 198, 200, 0.4); }
         .input-row:last-child { border-bottom: none; }
@@ -54,7 +64,21 @@
 <body>
 
 <div class="container">
-    <h1>Saúde <span style="color:var(--primary);">Smart</span></h1>
+    <header>
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="22" fill="url(#paint0_linear)"/>
+            <path d="M50 15L75 25V55C75 72.5 50 85 50 85C50 85 25 72.5 25 55V25L50 15Z" fill="white" fill-opacity="0.2"/>
+            <path d="M50 30V45M50 45L40 50M50 45L60 50" stroke="white" stroke-width="6" stroke-linecap="round"/>
+            <path d="M40 60C40 60 43 68 50 68C57 68 60 60 60 60" stroke="#34C759" stroke-width="6" stroke-linecap="round"/>
+            <defs>
+                <linearGradient id="paint0_linear" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnWrite">
+                    <stop stop-color="#007AFF"/>
+                    <stop offset="1" stop-color="#0051A8"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        <h1>FitPlan <span style="color:var(--primary);">Smart</span></h1>
+    </header>
     
     <div id="form-dieta">
         <div class="secao-input">
