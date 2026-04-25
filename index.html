@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FitPlan Pro - Edição Definitiva</title>
+    <title>FitPlan Pro - Edição Especialista</title>
     <style>
         :root { 
             --primary: #007AFF; --success: #34C759; --accent: #FF9500; 
@@ -36,16 +36,14 @@
 
         #resultado { margin-top: 25px; display: none; animation: fadeIn 0.4s; }
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; }
+        .card { background: var(--card); padding: 12px; border-radius: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
         .card strong { display: block; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; }
         .card span { font-size: 18px; font-weight: 700; color: var(--primary); }
 
         .bloco { background: var(--card); padding: 18px; border-radius: 16px; margin-bottom: 15px; }
         .bloco h3 { margin: 0 0 12px 0; font-size: 18px; color: var(--primary); }
         .op { border-left: 3px solid var(--success); padding-left: 10px; margin-bottom: 15px; font-size: 14px; }
-        .destaque { font-weight: 700; color: var(--text); }
         
-        /* Histórico */
         #historico-secao { margin-top: 40px; border-top: 1px solid rgba(198, 198, 200, 0.4); padding-top: 20px; }
         .hist-item { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
         .hist-data { font-size: 11px; color: var(--text-secondary); }
@@ -85,7 +83,7 @@
             </div>
             <div class="input-row">
                 <label>Esporte</label>
-                <input type="text" id="esporte" placeholder="Ex: Jiu Jitsu, Corrida...">
+                <input type="text" id="esporte" placeholder="Jiu Jitsu, Corrida, Musculação...">
             </div>
             <div class="input-row">
                 <label>Restrição</label>
@@ -97,7 +95,7 @@
                 </select>
             </div>
         </div>
-        <button onclick="gerarPlano()">Gerar Relatório</button>
+        <button onclick="gerarPlano()">Gerar Plano Inteligente</button>
     </div>
 
     <div id="resultado">
@@ -113,17 +111,17 @@
         </div>
 
         <div class="bloco" style="border-left: 4px solid var(--accent);">
-            <h3>🏅 Feedback de Performance</h3>
-            <p id="dica-esporte" style="font-size: 14px; line-height: 1.5;"></p>
+            <h3>🏅 Feedback Esportivo Profissional</h3>
+            <div id="motor-esporte"></div>
         </div>
         
         <button onclick="location.reload()" style="background: #3A3A3C;">Novo Cálculo</button>
     </div>
 
     <div id="historico-secao">
-        <h3 style="font-size: 16px; margin-bottom: 15px;">🕒 Histórico</h3>
+        <h3 style="font-size: 16px;">🕒 Histórico</h3>
         <div id="lista-historico"></div>
-        <button onclick="limparHistorico()" id="btn-limpar" style="background:transparent; color:#FF3B30; font-size:13px; font-weight:400; display:none;">Apagar Histórico</button>
+        <button onclick="limparHistorico()" id="btn-limpar" style="background:transparent; color:#FF3B30; font-size:12px; display:none; border:none; padding:10px; cursor:pointer; width: 100%;">Apagar Histórico</button>
     </div>
 </div>
 
@@ -139,9 +137,8 @@ function gerarPlano() {
     const esporteRaw = document.getElementById('esporte').value.toLowerCase();
     const restricao = document.getElementById('restricao').value;
 
-    if (!pInput || !iInput || !aInput) return alert("Preencha os campos obrigatórios.");
+    if (!pInput || !iInput || !aInput) return alert("Preencha todos os campos.");
 
-    // Cálculos
     let kcal = ((10 * pInput) + (6.25 * aInput) - (5 * iInput) + 5) * atividade;
     if (objetivo === 'emagrecer') kcal -= 500;
     if (objetivo === 'ganhar') kcal += 450;
@@ -149,47 +146,50 @@ function gerarPlano() {
     const protG = pInput * 2;
     const carbG = (kcal - (protG * 4) - (pInput * 0.8 * 9)) / 4;
 
-    // Salvar no Histórico
-    const hist = JSON.parse(localStorage.getItem('fitplan_data')) || [];
-    hist.unshift({ data: new Date().toLocaleDateString('pt-BR'), peso: pInput, kcal: Math.round(kcal) });
-    localStorage.setItem('fitplan_data', JSON.stringify(hist.slice(0, 5)));
-
-    // Feedback Esportivo Específico
+    // --- LÓGICA DO MOTOR DE BUSCA DE ESPORTE ---
     let feedback = "";
-    if (esporteRaw.includes("jiu") || esporteRaw.includes("luta") || esporteRaw.includes("boxe")) {
-        feedback = "<b>Foco em Combate:</b> Priorize gorduras boas para as articulações e mantenha o sódio sob controle. A hidratação é crítica para manter a pressão estável durante o rola/treino.";
-    } else if (esporteRaw.includes("corrida") || esporteRaw.includes("bike") || esporteRaw.includes("natação")) {
-        feedback = "<b>Foco em Endurance:</b> Você precisa de reserva de glicogênio. Foque na opção A de carboidratos no almoço e aumente a ingestão de água.";
-    } else if (esporteRaw.includes("musculação") || esporteRaw.includes("academia")) {
-        feedback = "<b>Foco em Força:</b> Distribua a proteína em pelo menos 4 janelas. Carboidratos são essenciais para carga; não os corte drasticamente.";
+    if (esporteRaw.includes("jiu") || esporteRaw.includes("luta") || esporteRaw.includes("boxe") || esporteRaw.includes("judô") || esporteRaw.includes("artes marciais")) {
+        feedback = "<b>Feedback de Combate:</b> Seu esporte exige alta demanda de energia intermitente. Priorize gorduras boas para proteger ligamentos e articulações. O sódio no pré-treino ajuda na pressão intra-abdominal e evita cãibras nos treinos de contato.";
+    } else if (esporteRaw.includes("corrida") || esporteRaw.includes("bike") || esporteRaw.includes("ciclismo") || esporteRaw.includes("natação") || esporteRaw.includes("endurance")) {
+        feedback = "<b>Feedback de Endurance:</b> O foco é a ressíntese de glicogênio. Seus carboidratos devem ser sua prioridade máxima. Use a 'Opção A' para garantir densidade calórica e não negligencie a hidratação mineral durante a prática.";
+    } else if (esporteRaw.includes("musculação") || esporteRaw.includes("academia") || esporteRaw.includes("hipertrofia") || esporteRaw.includes("bodybuilding")) {
+        feedback = "<b>Feedback de Força:</b> Para sinalizar hipertrofia, fracione as proteínas em pelo menos 4 janelas diárias. Use carboidratos complexos 1h30 antes do treino para sustentar a progressão de carga e volume.";
+    } else if (esporteRaw.includes("crossfit") || esporteRaw.includes("funcional") || esporteRaw.includes("wod")) {
+        feedback = "<b>Feedback Híbrido:</b> Você combina força e cardio. O corpo precisa de glicose disponível rápido. Frutas e mel são ótimos pré-treinos imediatos para sustentar a intensidade dos WODs sem quebrar massa muscular.";
+    } else if (esporteRaw.includes("futebol") || esporteRaw.includes("vôlei") || esporteRaw.includes("basquete") || esporteRaw.includes("tênis")) {
+        feedback = "<b>Feedback Intermitente:</b> Os sprints curtos drenam o glicogênio muscular. Após os jogos, sua janela de carboidratos é vital para evitar o catabolismo. Foque em vegetais de folhas escuras para magnésio e potássio.";
     } else {
-        feedback = `Para <b>${esporteRaw || "seu esporte"}</b>, o segredo é o equilíbrio. Beba ${Math.round(pInput * 35)}ml de água diariamente.`;
+        feedback = `Estratégia para <b>${esporteRaw || "sua modalidade"}</b>: Mantenha a hidratação em ${Math.round(pInput * 35)}ml diários e foque na constância das pesagens das refeições para atingir o objetivo de ${objetivo}.`;
     }
 
-    // Alimentos Base (Cálculo em Gramas)
+    // --- CARDÁPIO A/B ---
     const arrozG = Math.round((carbG/4) / 0.28);
     const carneG = Math.round((protG/4) / 0.30);
     const ovosN = Math.round((protG/4) / 6);
 
-    // Cardápio A/B
     let cafe, almoco, lanche, jantar;
     if (restricao === 'vegano') {
-        cafe = `A: Tofu Mexido + Fruta<br>B: Iogurte de Coco + 40g Aveia`;
-        almoco = `A: ${arrozG}g Arroz + 150g Grão de Bico<br>B: ${Math.round(arrozG*1.2)}g Batata + 120g Hambúrguer Vegetal`;
+        cafe = `A: Tofu mexido + 1 Fruta<br>B: Iogurte de Coco + 40g Aveia`;
+        almoco = `A: ${arrozG}g Arroz + 150g Grão de bico<br>B: ${Math.round(arrozG*1.2)}g Batata + 120g Hambúrguer Lentilha`;
         lanche = `A: 30g Castanhas + Fruta<br>B: Shake de Proteína Vegetal`;
-        jantar = `A: ${Math.round(arrozG*0.8)}g Quinoa + Tofu<br>B: Sopa de Lentilha`;
+        jantar = `A: ${Math.round(arrozG*0.8)}g Quinoa + Tofu<br>B: Sopa de Ervilha`;
     } else {
-        cafe = `A: ${ovosN} Ovos + Fruta<br>B: Iogurte Natural + 40g Aveia`;
+        cafe = `A: ${ovosN} Ovos + 1 Fruta<br>B: Iogurte Natural + 40g Aveia`;
         almoco = `A: ${arrozG}g Arroz + ${carneG}g Frango<br>B: ${Math.round(arrozG*1.2)}g Batata + ${carneG}g Carne Moída`;
-        lanche = `A: 30g Castanhas + Fruta<br>B: Whey + 1 Banana`;
+        lanche = `A: Fruta + 30g Castanhas<br>B: Whey Protein + 1 Banana`;
         jantar = `A: ${Math.round(arrozG*0.8)}g Arroz + ${carneG}g Peixe<br>B: Omelete de ${ovosN} ovos + Salada`;
     }
 
-    // Exibir
+    // --- HISTÓRICO ---
+    const hist = JSON.parse(localStorage.getItem('fit_final_v4')) || [];
+    hist.unshift({ data: new Date().toLocaleDateString('pt-BR'), peso: pInput, kcal: Math.round(kcal) });
+    localStorage.setItem('fit_final_v4', JSON.stringify(hist.slice(0, 5)));
+
+    // --- EXIBIÇÃO ---
     document.getElementById('res-kcal').innerText = Math.round(kcal);
     document.getElementById('res-p').innerText = Math.round(protG);
     document.getElementById('res-c').innerText = Math.round(carbG);
-    document.getElementById('dica-esporte').innerHTML = feedback;
+    document.getElementById('motor-esporte').innerHTML = `<p style="font-size:14px; line-height:1.4;">${feedback}</p>`;
     document.getElementById('lista-dieta').innerHTML = `
         <div class="op"><strong>Café:</strong><br>${cafe}</div>
         <div class="op"><strong>Almoço:</strong><br>${almoco}</div>
@@ -203,15 +203,24 @@ function gerarPlano() {
 }
 
 function exibirHistorico() {
-    const hist = JSON.parse(localStorage.getItem('fitplan_data')) || [];
+    const hist = JSON.parse(localStorage.getItem('fit_final_v4')) || [];
     const lista = document.getElementById('lista-historico');
     const btn = document.getElementById('btn-limpar');
     if (hist.length > 0) btn.style.display = 'block';
-    lista.innerHTML = hist.map(i => `<div class="hist-item"><div><strong>${i.peso}kg</strong> <span style="color:var(--primary)">${i.kcal} kcal</span></div><div class="hist-data">${i.data}</div></div>`).join('');
+    lista.innerHTML = hist.map(i => `
+        <div class="hist-item">
+            <div><strong>${i.peso}kg</strong> → <span style="color:var(--primary)">${i.kcal} kcal</span></div>
+            <div class="hist-data">${i.data}</div>
+        </div>
+    `).join('');
 }
 
 function limparHistorico() {
-    if(confirm("Limpar registros?")) { localStorage.removeItem('fitplan_data'); exibirHistorico(); document.getElementById('btn-limpar').style.display = 'none'; }
+    if(confirm("Deseja apagar o histórico?")) {
+        localStorage.removeItem('fit_final_v4');
+        exibirHistorico();
+        document.getElementById('btn-limpar').style.display = 'none';
+    }
 }
 </script>
 </body>
