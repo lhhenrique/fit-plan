@@ -29,6 +29,12 @@
         .input-row:last-child { border-bottom: none; }
         label { width: 140px; font-size: 15px; }
         input, select { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--text); text-align: right; outline: none; }
+        
+        /* Ajuste para textarea de preferências */
+        .input-block { padding: 12px 0; border-bottom: 0.5px solid rgba(198, 198, 200, 0.4); }
+        .input-block:last-child { border-bottom: none; }
+        .input-block label { display: block; width: 100%; margin-bottom: 8px; font-size: 15px; }
+        .input-block textarea { width: 100%; border: none; background: var(--bg); border-radius: 10px; padding: 10px; font-size: 14px; color: var(--text); outline: none; resize: none; box-sizing: border-box; }
 
         .agenda-grid { background: var(--card); border-radius: 14px; padding: 15px; margin-bottom: 20px; }
         .agenda-grid h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--primary); text-align: center; }
@@ -52,7 +58,13 @@
         .bloco { background: var(--card); padding: 18px; border-radius: 16px; margin-bottom: 15px; }
         .bloco h3 { margin: 0 0 12px 0; font-size: 16px; color: var(--primary); }
         
-        .dieta-box { border-left: 4px solid var(--success); padding-left: 12px; margin-bottom: 20px; }
+        .tabs-menu { display: flex; background: var(--bg); border-radius: 10px; padding: 2px; margin-bottom: 15px; gap: 2px; }
+        .tab-btn { flex: 1; background: transparent; border: none; color: var(--text-secondary); padding: 8px 0; font-size: 13px; font-weight: 600; border-radius: 8px; cursor: pointer; margin-bottom: 0; }
+        .tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0px 1px 3px rgba(0,0,0,0.1); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        .dieta-box { border-left: 4px solid var(--success); padding-left: 12px; margin-bottom: 15px; }
         .dieta-box.alt { border-left-color: var(--accent); }
         .dieta-box b { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; display: block; }
         .dieta-box p { margin: 5px 0 0; font-size: 15px; line-height: 1.4; }
@@ -116,6 +128,10 @@
                     <option value="gluten">Sem Glúten</option>
                 </select>
             </div>
+            <div class="input-block">
+                <label>🍕 Alimentos que você ama comer:</label>
+                <textarea id="preferencias" rows="2" placeholder="Ex: arroz, feijão, chocolate, hambúrguer, banana, batata frita..."></textarea>
+            </div>
         </div>
         <button onclick="gerarPlano()">Gerar Estratégia de Elite</button>
     </div>
@@ -136,8 +152,14 @@
         </div>
 
         <div class="bloco">
-            <h3>🍴 Cardápio (A/B)</h3>
-            <div id="cardapio"></div>
+            <h3>🍴 Cardápios Adaptados ao Seu Gosto</h3>
+            <div class="tabs-menu">
+                <button class="tab-btn active" onclick="switchTab('opcaoA')">Opção A</button>
+                <button class="tab-btn" onclick="switchTab('opcaoB')">Opção B</button>
+                <button class="tab-btn" onclick="switchTab('opcaoC')">Opção C</button>
+                <button class="tab-btn" onclick="switchTab('opcaoD')">Opção D</button>
+            </div>
+            <div id="cardapio-conteudo"></div>
         </div>
 
         <div class="bloco" style="background: rgba(0,0,0,0.03); border: 1px dashed var(--text-secondary);">
@@ -171,6 +193,14 @@ window.onload = () => {
     exibirHistorico();
 };
 
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
 function gerarPlano() {
     const nome = document.getElementById('nome').value || "Atleta";
     const peso = parseFloat(document.getElementById('peso').value);
@@ -178,6 +208,7 @@ function gerarPlano() {
     const idade = parseInt(document.getElementById('idade').value);
     const objetivo = document.getElementById('objetivo').value;
     const restricao = document.getElementById('restricao').value;
+    const prefs = (document.getElementById('preferencias').value || "").toLowerCase();
 
     if (!peso || !altura || !idade) return alert("Preencha todos os dados.");
     localStorage.setItem('fit_nome', nome);
@@ -211,52 +242,107 @@ function gerarPlano() {
     const pG = peso * 2.2;
     const cG = (kcal - (pG * 4) - (peso * 0.9 * 9)) / 4;
 
-    // MOTOR DE FEEDBACK ESPORTIVO AVANÇADO
-    let fbk = `💧 <b>Hidratação Crítica:</b> Consuma no mínimo <b>${Math.round(peso * 45)}ml</b> de água. Em dias de treino, adicione 500ml para cada hora de atividade.<br><br>`;
+    // ALIMENTOS BASE CALCULADOS
+    const arroz = Math.round((cG * 0.30) / 0.28);
+    const batataDoce = Math.round((cG * 0.30) / 0.20);
+    const aveia = Math.round((cG * 0.20) / 0.60);
+    const frango = Math.round((pG * 0.30) / 0.25);
+    const carneMagra = Math.round((pG * 0.30) / 0.26);
+    const tofu = Math.round((pG * 0.30) / 0.08);
+
+    // INTEGRAÇÃO DE PREFERÊNCIAS E ADAPTAÇÕES SAUDÁVEIS
+    let carbAlmoco = `${arroz}g de Arroz Integral`;
+    let protAlmoco = restricao === 'vegano' ? `${tofu}g de Tofu Grelhado` : `${frango}g de Peito de Frango`;
+    let docePermitido = "1 Fruta Fresca";
+    let lancheCustom = "Shake: 1 Banana + Aveia + Proteína";
+    let jantarCustom = restricao === 'vegano' ? `${tofu}g de Tofu` : `${frango}g de Frango Desfiado`;
+    let fbkCustom = "";
+
+    // Análise de gatilhos de preferências
+    if(prefs.includes("batata doce") || prefs.includes("mandioca")) {
+        carbAlmoco = `${batataDoce}g de Batata Doce ou Mandioca Assada`;
+    } else if(prefs.includes("arroz") || prefs.includes("feijão") || prefs.includes("feijao")) {
+        carbAlmoco = `${Math.round(arroz * 0.7)}g de Arroz + 80g de Feijão`;
+    } else if(prefs.includes("macarrão") || prefs.includes("macarrao") || prefs.includes("massa")) {
+        carbAlmoco = `${Math.round(arroz * 0.9)}g de Macarrão Integral ao Molho Sugo`;
+    }
+
+    if(prefs.includes("carne") || prefs.includes("patinho") || prefs.includes("bife")) {
+        if(restricao !== 'vegano') protAlmoco = `${carneMagra}g de Patinho Moído ou Filé Mignon Grelhado`;
+    }
+
+    if(prefs.includes("chocolate") || prefs.includes("doce")) {
+        docePermitido = "20g de Chocolate Amargo 70% ou superior";
+        fbkCustom += `🍫 <b>Ajuste de Desejo:</b> Alocamos um quadrado de chocolate amargo logo após o seu almoço. O teor de cacau ajuda na saciedade e não prejudica sua queima calórica.<br><br>`;
+    }
     
-    if(diasDuplos > 0) {
-        fbk += `⚡ <b>Volume de Elite:</b> Identificamos ${diasDuplos} dias de carga dupla. A <b>Opção A</b> do almoço é sua base de glicogênio. Se sentir fadiga, adicione 30g de Palatinose ou Malto durante o segundo treino.<br><br>`;
+    if(prefs.includes("hambúrguer") || prefs.includes("hamburguer")) {
+        jantarCustom = `Hambúrguer Caseiro Fit (${carneMagra}g de carne magra moldada grelhada) no Prato com salada`;
+        fbkCustom += `🍔 <b>Versão Fit de Elite:</b> Seu desejo por hambúrguer foi adaptado! Prepare em casa com carne magra pura, sem óleo, servido direto no prato com queijo magro.<br><br>`;
     }
 
-    if(agendaStr.includes("futsal") || agendaStr.includes("corrida") || agendaStr.includes("cardio")) {
-        fbk += `🏃 <b>Perfil Endurace:</b> Para esportes de campo ou corrida, foque na ingestão de magnésio e potássio no jantar (vegetais escuros) para evitar cãibras noturnas.<br><br>`;
+    if(prefs.includes("pizza")) {
+        jantarCustom = `Pizza Fit de Frigideira (Massa de Rap10 Integral ou Couve-flor, molho natural, queijo magro e frango desfiado)`;
+        fbkCustom += `🍕 <b>Noite de Pizza Saudável:</b> Adaptamos o jantar para uma versão de pizza funcional de baixa caloria e alta proteína.<br><br>`;
     }
 
-    if(agendaStr.includes("jiu") || agendaStr.includes("luta") || agendaStr.includes("cross")) {
-        fbk += `🤼 <b>Impacto e Explosão:</b> Seus treinos exigem muito do sistema nervoso. Priorize o sono de 8h e considere 5g de Creatina diariamente para manter os estoques de ATP elevados.<br><br>`;
+    if(prefs.includes("ovo") || prefs.includes("omelete")) {
+        lancheCustom = "Omelete de 3 ovos com vegetais + 1 fatia de pão integral";
     }
 
-    if(agendaStr.includes("musculação") || agendaStr.includes("treino") || agendaStr.includes("academia")) {
-        fbk += `💪 <b>Anabolismo:</b> Com ${treinosTotais} sessões semanais, sua janela proteica é constante. Tente distribuir as <b>${Math.round(pG)}g de proteína</b> em 4 ou 5 refeições iguais.<br>`;
-    }
+    // MOTOR DE FEEDBACK GERAL
+    let fbk = `💧 <b>Hidratação Crítica:</b> Consuma no mínimo <b>${Math.round(peso * 45)}ml</b> de água.<br><br>${fbkCustom}`;
+    if(diasDuplos > 0) fbk += `⚡ <b>Volume de Elite:</b> Identificamos ${diasDuplos} dias de carga dupla. Use o carboidrato do almoço como sua base de energia.<br><br>`;
+    if(agendaStr.includes("musculação") || agendaStr.includes("academia")) fbk += `💪 <b>Anabolismo:</b> Tente distribuir as <b>${Math.round(pG)}g de proteína</b> em refeições iguais ao longo do dia.<br>`;
 
     document.getElementById('feedback-coach').innerHTML = fbk;
 
-    // UI E CARDÁPIO
+    // CONFIGURAÇÃO DE ACORDO COM AS RESTRIÇÕES FIXAS
+    let pao = restricao === "gluten" ? "Pão Sem Glúten" : "Pão Integral";
+    let shakeBase = restricao === "vegano" ? "Proteína Isolada de Ervilha" : (restricao === "lactose" ? "Whey Isolado Zero Lactose" : "Whey Protein");
+
+    // ESTRUTURA DOS CARDÁPIOS COM AS PREFERÊNCIAS INJETADAS
+    let cardapioHTML = `
+        <div id="opcaoA" class="tab-content active">
+            <div class="dieta-box"><b>Café da Manhã</b><p>${restricao === 'vegano' ? 'Mexido de Tofu' : '3 Ovos Mexidos'} + 2 Fatias de ${pao} + 1 Fruta de sua escolha</p></div>
+            <div class="dieta-box alt"><b>Almoço (Adaptado)</b><p>${carbAlmoco} + ${protAlmoco} + Salada Verde Livre + <b>Sobremesa:</b> ${docePermitido}</p></div>
+            <div class="dieta-box"><b>Lanche da Tarde</b><p>${lancheCustom}</p></div>
+            <div class="dieta-box alt"><b>Jantar (Adaptado)</b><p>${jantarCustom} + Legumes no Vapor (Brócolis/Chuchu)</p></div>
+        </div>
+
+        <div id="opcaoB" class="tab-content">
+            <div class="dieta-box"><b>Café da Manhã</b><p>Vitamina Prática: 1 Banana + ${aveia}g de Aveia + 30g de ${shakeBase}</p></div>
+            <div class="dieta-box alt"><b>Almoço</b><p>${batataDoce}g de Batata Doce + ${restricao === 'vegano' ? '180g de Grão de Bico' : carneMagra + 'g de Patinho'} + Salada</p></div>
+            <div class="dieta-box"><b>Lanche da Tarde</b><p>2 Fatias de ${pao} + ${restricao === 'vegano' ? 'Hummus' : '3 Ovos Cozidos'}</p></div>
+            <div class="dieta-box alt"><b>Jantar</b><p>${arroz}g de Arroz Integral + Peixe Grelhado + Mix de Folhas</p></div>
+        </div>
+
+        <div id="opcaoC" class="tab-content">
+            <div class="dieta-box"><b>Café da Manhã</b><p>Crepioca Funcional (2 ovos + 30g de Tapioca) *Se vegano: Tapioca com Tofu</p></div>
+            <div class="dieta-box alt"><b>Almoço</b><p>${carbAlmoco} + ${protAlmoco} + Vegetais Variados</p></div>
+            <div class="dieta-box"><b>Lanche da Tarde</b><p>1 Maçã Picada + 20g de Castanhas + Dose de ${shakeBase}</p></div>
+            <div class="dieta-box alt"><b>Jantar</b><p>Sopa de Legumes Batida com ${restricao === 'vegano' ? 'Proteína de Soja' : 'Desfiado de Frango'}</p></div>
+        </div>
+
+        <div id="opcaoD" class="tab-content">
+            <div class="dieta-box"><b>Café da Manhã</b><p>Bowl: 150g de Iogurte Magro (ou Vegano) + ${aveia}g de Aveia + Morangos Picados</p></div>
+            <div class="dieta-box alt"><b>Almoço</b><p>${batataDoce}g de Mandioca Cozida + ${protAlmoco} + Aspargos</p></div>
+            <div class="dieta-box"><b>Lanche da Tarde</b><p>Tomates Cereja + Cubos de Queijo Magro (ou Tofu) + 1 Torrada de Arroz</p></div>
+            <div class="dieta-box alt"><b>Jantar</b><p>Wrap leve com folha de Couve ou Rap10 Integral recheado com Proteína e Rúcula</p></div>
+        </div>
+    `;
+    
+    document.getElementById('cardapio-conteudo').innerHTML = cardapioHTML;
+
     document.getElementById('saudacao').innerText = `Consultoria: ${nome}`;
     document.getElementById('res-kcal').innerText = Math.round(kcal);
     document.getElementById('res-p').innerText = Math.round(pG) + "g";
     document.getElementById('res-c').innerText = Math.round(cG) + "g";
-
-    const arroz = Math.round((cG * 0.35) / 0.28);
-    const frango = Math.round((pG * 0.35) / 0.25);
-    const pao = restricao === "gluten" ? "Pão S/ Glúten" : "Pão Integral";
-    const leite = restricao === "lactose" ? "S/ Lactose" : "Natural";
-
-    let menu = `
-        <div class="dieta-box"><b>Café da Manhã (A)</b><p>3 Ovos + 2 Fatias ${pao} + 1 Fruta</p></div>
-        <div class="dieta-box alt"><b>Café da Manhã (B)</b><p>Shake: 1 Banana + 40g Aveia + 30g Whey</p></div>
-        <div class="dieta-box"><b>Almoço (A)</b><p>${arroz}g Arroz + ${frango}g Frango + Vegetais Livres</p></div>
-        <div class="dieta-box alt"><b>Almoço (B)</b><p>${arroz + 40}g Batata Doce + ${frango}g Carne Magra</p></div>
-        <div class="dieta-box"><b>Jantar (A)</b><p>${frango}g Peixe/Frango + Brócolis + 1 Maçã</p></div>
-        <div class="dieta-box alt"><b>Jantar (B)</b><p>Omelete (3 ovos) + Queijo ${leite} + Salada Verde</p></div>
-    `;
     
-    document.getElementById('cardapio').innerHTML = menu;
     document.getElementById('info-usuario-final').innerHTML = `
         • <b>Atleta:</b> ${nome} | ${peso}kg | ${altura}cm<br>
-        • <b>Fator de Atividade:</b> ${fa.toFixed(3)} (${treinosTotais}x/sem)<br>
         • <b>Restrições:</b> ${restricao.toUpperCase()}<br>
+        • <b>Preferências Adaptadas:</b> ${prefs || "Nenhuma informada"}<br>
         • <b>Rotina:</b> ${agendaResumo || "Não informada"}
     `;
 
